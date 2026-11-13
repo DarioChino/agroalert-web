@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroAlert Araucanía — Monitoreo agroclimático y control de riego</title>
+  <meta name="description" content="AgroAlert Araucanía monitorea la temperatura y la humedad de tu cultivo y te permite controlar el riego desde tu celular por Wi-Fi. Proyecto TI3042, INACAP.">
+  <meta name="theme-color" content="#08120d">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Open Graph / Twitter. og:image y twitter:image usan URL absoluta del sitio publicado. -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_CL">
+  <meta property="og:site_name" content="AgroAlert Araucanía">
+  <meta property="og:title" content="AgroAlert Araucanía — Monitoreo agroclimático y control de riego">
+  <meta property="og:description" content="Temperatura, humedad y control de riego desde tu celular, por Wi-Fi. Tecnología para el agricultor de La Araucanía.">
+  <meta property="og:image" content="https://dariochino.github.io/agroalert-web/assets/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AgroAlert Araucanía: monitoreo agroclimático y control de riego">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AgroAlert Araucanía">
+  <meta name="twitter:description" content="Temperatura, humedad y control de riego desde tu celular, por Wi-Fi.">
+  <meta name="twitter:image" content="https://dariochino.github.io/agroalert-web/assets/og-cover.png">
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" sizes="180x180">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <script>document.documentElement.classList.add('js');</script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <!-- Sprite de iconos SVG: trazo uniforme, sin emojis. -->
+  <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="i-temp" viewBox="0 0 24 24">
+      <path d="M14 14.76V5a2 2 0 1 0-4 0v9.76a4 4 0 1 0 4 0Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 10v6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24">
+      <path d="M12 2.7c3.2 3.6 5.8 6.5 5.8 9.3a5.8 5.8 0 1 1-11.6 0c0-2.8 2.6-5.7 5.8-9.3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M9.4 13.2a2.7 2.7 0 0 0 2.6 2.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24">
+      <path d="M3 8.6a14 14 0 0 1 18 0M6.2 12.2a9.4 9.4 0 0 1 11.6 0M9.4 15.8a4.8 4.8 0 0 1 5.2 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="12" cy="19.2" r="1.4" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24">
+      <path d="M12 3 4.5 6v5.2c0 4.4 3 8.4 7.5 9.8 4.5-1.4 7.5-5.4 7.5-9.8V6L12 3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="m8.8 12 2.1 2.1 4.3-4.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24">
+      <rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-power" viewBox="0 0 24 24">
+      <path d="M12 3v8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M6.3 6.3a8 8 0 1 0 11.4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24">
+      <path d="M2.6 12S6.2 5.6 12 5.6 21.4 12 21.4 12 17.8 18.4 12 18.4 2.6 12 2.6 12Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="2.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24">
+      <path d="M4 18a8 8 0 1 1 16 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="m12 18 4.2-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="12" cy="18" r="1.6" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M12 7.6V12l3 1.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <path d="M12 4.2 21 19.5H3L12 4.2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M12 9.4v4.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="12" cy="16.6" r=".9" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-map" viewBox="0 0 24 24">
+      <path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="12" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24">
+      <path d="M12 3v12m-4.5-4.5L12 15l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4.5 19.5h15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24">
+      <path d="M4.5 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="m20 6.5-11 11-5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24">
+      <rect x="7" y="7" width="10" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24">
+      <circle cx="9" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M3.5 20a5.5 5.5 0 0 1 11 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M16.4 5.7a3.2 3.2 0 0 1 0 5.6M18.2 20a5.5 5.5 0 0 0-2.3-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-sprout" viewBox="0 0 24 24">
+      <path d="M12 21v-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M12 14c0-4 3-7 8-7 0 4-3 7-8 7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M12 16c0-3-2.2-5-6-5 0 3 2.2 5 6 5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24">
+      <rect x="7" y="2.5" width="10" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M11 5.2h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="12" cy="18.6" r=".9" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  <header class="site-header" id="site-header">
+    <div class="container nav">
+      <a class="brand" href="#inicio" aria-label="AgroAlert Araucanía, ir al inicio">
+        <img src="assets/logo.svg" alt="" width="40" height="40">
+        <span class="brand-text">
+          <strong>AgroAlert</strong>
+          <span>Araucanía</span>
+        </span>
+      </a>
+
+      <nav class="nav-links" id="nav-links" aria-label="Navegación principal">
+        <a href="#problema">Problema</a>
+        <a href="#solucion">Solución</a>
+        <a href="#caracteristicas">Características</a>
+        <a href="#seguridad">Seguridad</a>
+        <a href="#equipo">Equipo</a>
+        <a class="btn btn--primary btn--sm nav-cta" href="#descargar">
+          <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+          Descargar app
+        </a>
+      </nav>
+
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Abrir menú">
+        <svg class="icon icon--menu" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="icon icon--close" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <!-- 1. Hero -->
+    <section class="hero" id="inicio">
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Tecnología para el campo · La Araucanía</p>
+          <h1>Tu cultivo, protegido <span class="accent">antes de la helada.</span></h1>
+          <p class="lead">
+            AgroAlert monitorea la temperatura y la humedad de tu huerto y te permite
+            verlas y controlar el riego desde tu celular, por Wi-Fi. Sin nube y sin
+            depender de estar ahí.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn--primary" href="#descargar">
+              <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+              Descargar app
+            </a>
+            <a class="btn btn--ghost" href="#solucion">
+              Ver cómo funciona
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
+            </a>
+          </div>
+          <p class="hero-meta">Android 8.0 o superior · APK 1,4 MB · Versión 1.0.0</p>
+        </div>
+
+        <div class="hero-visual reveal" style="--delay:.12s">
+          <div class="phone-glow" aria-hidden="true"></div>
+          <div class="phone">
+            <img src="assets/screens/panel.webp" width="540" height="1100"
+                 alt="Panel de AgroAlert con temperatura de 8,0 grados, humedad de 65 por ciento y alerta de prehelada."
+                 fetchpriority="high" decoding="async">
+          </div>
+
+          <div class="float-card float-card--temp glass" aria-hidden="true">
+            <span class="float-icon float-icon--amber">
+              <svg class="icon" aria-hidden="true"><use href="#i-temp"/></svg>
+            </span>
+            <span class="float-text"><strong>8,0 °C</strong><span>Alerta de prehelada</span></span>
+          </div>
+          <div class="float-card float-card--relay glass" aria-hidden="true">
+            <span class="float-icon float-icon--green">
+              <svg class="icon" aria-hidden="true"><use href="#i-power"/></svg>
+            </span>
+            <span class="float-text"><strong>Relé apagado</strong><span>Modo automático</span></span>
+          </div>
+
+          <p class="hero-visual-note">Captura real de la app · datos del simulador</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. El problema -->
+    <section class="section" id="problema">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">El problema</p>
+          <h2>Una helada puede borrar meses de trabajo.</h2>
+          <p class="lead">
+            En La Araucanía, una noche de frío puede dañar un cultivo que tomó meses.
+            Muchas decisiones —regar, cubrir o esperar— se toman sin datos y sin estar
+            en el campo.
+          </p>
+        </header>
+
+        <div class="grid grid--3">
+          <article class="card glass reveal">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg></span>
+            <h3>Decisiones a ciegas</h3>
+            <p>Sin temperatura ni humedad en el momento, se riega o se cubre por intuición.</p>
+          </article>
+          <article class="card glass reveal" style="--delay:.08s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg></span>
+            <h3>El tiempo no espera</h3>
+            <p>Una helada nocturna puede afectar el cultivo antes de que alcances a reaccionar.</p>
+          </article>
+          <article class="card glass reveal" style="--delay:.16s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg></span>
+            <h3>Todo depende de estar ahí</h3>
+            <p>Revisar el huerto implica traslados. Si no estás, no sabes qué está pasando.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. La solución -->
+    <section class="section section--tint" id="solucion">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">La solución</p>
+          <h2>Cuatro pasos entre el sensor y tu decisión.</h2>
+          <p class="lead">
+            AgroAlert convierte lecturas del ambiente en información útil, sin lenguaje
+            técnico y sin sacarte de tu rutina.
+          </p>
+        </header>
+
+        <div class="grid grid--2 steps">
+          <article class="step glass reveal">
+            <span class="step-num">01</span>
+            <span class="step-icon"><svg class="icon" aria-hidden="true"><use href="#i-chip"/></svg></span>
+            <h3>Mide</h3>
+            <p>Un sensor de temperatura y humedad registra las condiciones del ambiente en el huerto.</p>
+          </article>
+          <article class="step glass reveal" style="--delay:.08s">
+            <span class="step-num">02</span>
+            <span class="step-icon"><svg class="icon" aria-hidden="true"><use href="#i-gauge"/></svg></span>
+            <h3>Clasifica</h3>
+            <p>El sistema compara las lecturas con los umbrales del proyecto: normal sobre 10 °C, prehelada entre 5 y 10 °C, riesgo crítico en 5 °C o menos.</p>
+          </article>
+          <article class="step glass reveal" style="--delay:.16s">
+            <span class="step-num">03</span>
+            <span class="step-icon"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg></span>
+            <h3>Te muestra</h3>
+            <p>La app recibe los datos cada 2 segundos por Wi-Fi y los presenta en un panel simple, desde tu celular.</p>
+          </article>
+          <article class="step glass reveal" style="--delay:.24s">
+            <span class="step-num">04</span>
+            <span class="step-icon"><svg class="icon" aria-hidden="true"><use href="#i-power"/></svg></span>
+            <h3>Actúa</h3>
+            <p>Puedes encender o apagar el riego, o dejarlo en automático. Cada orden se confirma desde el nodo.</p>
+          </article>
+        </div>
+
+        <p class="scope-note glass reveal">
+          <svg class="icon" aria-hidden="true"><use href="#i-sprout"/></svg>
+          El prototipo funciona hoy con la app y un nodo simulado. La integración con el Arduino físico está en desarrollo.
+        </p>
+      </div>
+    </section>
+
+    <!-- 4. Características -->
+    <section class="section" id="caracteristicas">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Características principales</p>
+          <h2>Lo esencial, bien resuelto.</h2>
+          <p class="lead">Cada función responde a una necesidad concreta del manejo diario del cultivo.</p>
+        </header>
+
+        <div class="grid grid--3">
+          <article class="card glass reveal">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-temp"/></svg></span>
+            <h3>Telemetría cada 2 segundos</h3>
+            <p>Temperatura y humedad actualizadas de forma continua, sin bloquear la aplicación.</p>
+          </article>
+          <article class="card glass reveal" style="--delay:.06s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-gauge"/></svg></span>
+            <h3>Semáforo de riesgo</h3>
+            <p>Tres estados claros —normal, prehelada y riesgo crítico— según los umbrales del proyecto.</p>
+          </article>
+          <article class="card glass reveal" style="--delay:.12s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-power"/></svg></span>
+            <h3>Control de riego</h3>
+            <p>Encender, apagar o volver al modo automático. El panel muestra el estado real del relé.</p>
+          </article>
+          <article class="card glass reveal" style="--delay:.18s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></span>
+            <h3>Dos roles</h3>
+            <p><strong>Control</strong> opera el riego. <strong>Monitor</strong> solo consulta: no tiene botones de mando.</p>
+          </article>
+          <article class="card glass reveal" style="--delay:.24s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg></span>
+            <h3>Acceso protegido</h3>
+            <p>Tres intentos fallidos bloquean el ingreso durante 60 segundos.</p>
+          </article>
+          <article class="card glass reveal" style="--delay:.3s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-wifi"/></svg></span>
+            <h3>Red local</h3>
+            <p>Funciona en la misma red Wi-Fi del nodo, sin servicios en la nube ni suscripciones.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Contexto comercial -->
+    <section class="section section--tint" id="contexto">
+      <div class="container context-grid">
+        <div class="reveal">
+          <p class="eyebrow">Contexto comercial</p>
+          <h2>Tecnología pensada para el campo real.</h2>
+          <p class="lead">
+            AgroAlert está orientado a pequeños y medianos agricultores de La Araucanía
+            que necesitan tomar decisiones a tiempo sin estar permanentemente en el cultivo.
+          </p>
+          <ul class="check-list">
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Menos traslados para revisar el estado del huerto.</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Reacción temprana ante condiciones de prehelada.</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Control del riego desde el celular, dentro de la misma red Wi-Fi.</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Sin costos de nube ni planes de datos para el monitoreo local.</li>
+          </ul>
+        </div>
+
+        <aside class="context-panel glass reveal" style="--delay:.1s">
+          <h3>¿Por qué la Araucanía?</h3>
+          <div class="context-item">
+            <span class="context-icon"><svg class="icon" aria-hidden="true"><use href="#i-temp"/></svg></span>
+            <div><strong>Noches frías</strong><p>Las oscilaciones térmicas y las heladas tardías son parte del riesgo real del cultivo.</p></div>
+          </div>
+          <div class="context-item">
+            <span class="context-icon"><svg class="icon" aria-hidden="true"><use href="#i-sprout"/></svg></span>
+            <div><strong>Producción hortofrutícola</strong><p>Huertos y pequeños productores necesitan herramientas simples y de bajo costo.</p></div>
+          </div>
+          <div class="context-item">
+            <span class="context-icon"><svg class="icon" aria-hidden="true"><use href="#i-wifi"/></svg></span>
+            <div><strong>Operación local</strong><p>El proyecto prioriza una red local: no depende de un servidor externo.</p></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 6. Seguridad y confiabilidad -->
+    <section class="section" id="seguridad">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Seguridad y confiabilidad</p>
+          <h2>La tranquilidad también se diseña.</h2>
+          <p class="lead">
+            El acceso y las órdenes están protegidos en cada paso, desde el celular
+            hasta el nodo que acciona el riego.
+          </p>
+        </header>
+
+        <div class="grid grid--3">
+          <article class="card card--compact glass reveal">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg></span>
+            <h3>Ingreso con 3 intentos</h3>
+            <p>Tras tres intentos fallidos, el acceso se bloquea durante 60 segundos.</p>
+          </article>
+          <article class="card card--compact glass reveal" style="--delay:.06s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></span>
+            <h3>Contraseñas protegidas</h3>
+            <p>Se guardan con sal aleatoria y PBKDF2-HMAC-SHA256; nunca en texto plano.</p>
+          </article>
+          <article class="card card--compact glass reveal" style="--delay:.12s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></span>
+            <h3>Permisos separados</h3>
+            <p>Control puede operar el riego. Monitor solo consulta: el nodo también rechaza sus órdenes.</p>
+          </article>
+          <article class="card card--compact glass reveal" style="--delay:.18s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span>
+            <h3>Confirmación real</h3>
+            <p>El estado del relé que ves es el que reporta el nodo, no una suposición de la app.</p>
+          </article>
+          <article class="card card--compact glass reveal" style="--delay:.24s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg></span>
+            <h3>Datos con vigencia</h3>
+            <p>Si el enlace se corta, la app marca los datos como antiguos y bloquea los controles.</p>
+          </article>
+          <article class="card card--compact glass reveal" style="--delay:.3s">
+            <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-wifi"/></svg></span>
+            <h3>Sin exposición a Internet</h3>
+            <p>Diseñado para operar en una red local de confianza. El prototipo no expone el nodo a Internet.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Descarga -->
+    <section class="section section--tint" id="descargar">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Descarga</p>
+          <h2>Lleva AgroAlert a tu celular.</h2>
+          <p class="lead">Instalación directa, sin cuentas y sin tiendas de aplicaciones.</p>
+        </header>
+
+        <div class="download-grid">
+          <div class="download-panel glass reveal">
+            <div class="download-head">
+              <span class="download-icon"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg></span>
+              <div>
+                <h3>AgroAlert Araucanía</h3>
+                <p>APK para Android</p>
+              </div>
+            </div>
+
+            <dl class="download-facts">
+              <div><dt>Versión</dt><dd>1.0.0</dd></div>
+              <div><dt>Requisito</dt><dd>Android 8.0 o superior</dd></div>
+              <div><dt>Tamaño</dt><dd>1,4 MB</dd></div>
+              <div><dt>Actualizado</dt><dd>11-11-2026</dd></div>
+            </dl>
+
+            <a class="btn btn--primary btn--wide" href="assets/AgroAlert-1.0.apk" download>
+              <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+              Descargar APK
+            </a>
+
+            <p class="download-note">
+              El archivo está firmado para instalación directa. No requiere cuenta ni
+              servicios en la nube.
+            </p>
+
+            <details class="sha">
+              <summary>Ver huella SHA-256</summary>
+              <code>7DA174456A6B8192EDDCE4B896134DBECB4CB60183B8AC4A58386A6398D7ED40</code>
+            </details>
+          </div>
+
+          <div class="download-side reveal" style="--delay:.1s">
+            <ol class="install-steps">
+              <li>
+                <span class="install-num">1</span>
+                <div><strong>Descarga el archivo</strong><p>Hazlo desde este mismo celular Android.</p></div>
+              </li>
+              <li>
+                <span class="install-num">2</span>
+                <div><strong>Permite la instalación</strong><p>Cuando el sistema lo pida, autoriza instalar apps de origen desconocido.</p></div>
+              </li>
+              <li>
+                <span class="install-num">3</span>
+                <div><strong>Abre la app y crea tus claves</strong><p>Al primer inicio define las contraseñas de Control y Monitor.</p></div>
+              </li>
+            </ol>
+
+            <p class="download-note download-note--muted">
+              Para usar la app necesitas estar en la misma red Wi-Fi que el nodo AgroAlert.
+              El proyecto incluye un simulador para pruebas sin hardware.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Equipo y contacto -->
+    <section class="section" id="equipo">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Equipo y contacto</p>
+          <h2>Un proyecto nacido en La Araucanía.</h2>
+        </header>
+
+        <div class="team-grid">
+          <div class="team-card glass reveal">
+            <div class="person">
+              <span class="avatar" aria-hidden="true">DC</span>
+              <div><strong>Darío Candia</strong><span>Desarrollo del proyecto</span></div>
+            </div>
+            <div class="person">
+              <span class="avatar" aria-hidden="true">ST</span>
+              <div><strong>Sebastián Torres</strong><span>Desarrollo del proyecto</span></div>
+            </div>
+            <p class="team-note">Proyecto TI3042 · INACAP · 2026<br>Docente: Franco Fossati Cordero</p>
+          </div>
+
+          <div class="contact-card glass reveal" style="--delay:.1s">
+            <h3>Contacto</h3>
+            <p class="contact-line">
+              <svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>
+              <span class="placeholder">[COMPLETAR: correo de contacto]</span>
+            </p>
+            <p class="contact-line">
+              <svg class="icon" aria-hidden="true"><use href="#i-map"/></svg>
+              <span>La Araucanía, Chile</span>
+            </p>
+            <p class="contact-note">
+              Para consultas sobre el proyecto, la app o una posible colaboración.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="#inicio" aria-label="AgroAlert Araucanía, ir al inicio">
+          <img src="assets/logo.svg" alt="" width="36" height="36" loading="lazy">
+          <span class="brand-text"><strong>AgroAlert</strong><span>Araucanía</span></span>
+        </a>
+        <p>Monitoreo agroclimático y control de riego para el agricultor de La Araucanía.</p>
+      </div>
+
+      <nav class="footer-nav" aria-label="Enlaces del sitio">
+        <a href="#problema">Problema</a>
+        <a href="#solucion">Solución</a>
+        <a href="#caracteristicas">Características</a>
+        <a href="#seguridad">Seguridad</a>
+        <a href="#descargar">Descargar</a>
+        <a href="#equipo">Equipo</a>
+      </nav>
+
+      <div class="footer-meta">
+        <p>Proyecto TI3042 · INACAP</p>
+        <p>Hecho en La Araucanía, Chile.</p>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <p>© <span id="year">2026</span> AgroAlert Araucanía. Proyecto académico.</p>
+      <a href="#inicio" class="back-top">Volver arriba</a>
+    </div>
+  </footer>
+</body>
+</html>

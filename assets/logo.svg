@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="AgroAlert Araucanía">
+  <defs>
+    <linearGradient id="agroLeaf" x1="4" y1="2" x2="44" y2="46" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9adfb2"/>
+      <stop offset="1" stop-color="#2f7d54"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="14" fill="url(#agroLeaf)"/>
+  <path fill="#f1f6f1" d="M12,27C10,14 24,9 37,10C37,26 29,35 19,31L15,38L12,36L28,18C21,20 16,24 12,27Z"/>
+</svg>
