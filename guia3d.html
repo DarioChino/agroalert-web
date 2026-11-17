@@ -8,249 +8,305 @@
   html, body { margin: 0; height: 100%; overflow: hidden; background: #10161a; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
   canvas { display: block; }
   #card {
-    position: fixed; top: 16px; left: 16px; width: min(360px, calc(100vw - 32px));
-    background: rgba(14, 24, 20, .92); color: #e6efe9; border: 1px solid rgba(120, 200, 160, .35);
-    border-radius: 18px; padding: 16px 18px 14px; box-shadow: 0 10px 30px rgba(0,0,0,.45);
-    backdrop-filter: blur(6px); z-index: 10;
+    position: fixed; top: 14px; left: 14px; width: min(380px, calc(100vw - 28px));
+    background: rgba(12, 22, 18, .93); color: #e6efe9; border: 1px solid rgba(120, 200, 160, .35);
+    border-radius: 18px; padding: 14px 16px 12px; box-shadow: 0 10px 30px rgba(0,0,0,.5);
+    z-index: 10;
   }
+  #topRow { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   #stepNum { font-size: 11px; letter-spacing: 2px; color: #7fd0a5; font-weight: 700; }
+  #practiceBtn { padding: 6px 10px; border-radius: 999px; border: 1px solid #3d5a4b; background: #16241d; color: #cfe8da; font-size: 12px; font-weight: 700; cursor: pointer; flex: none; }
+  #practiceBtn.on { background: #b8860b; border-color: #b8860b; color: #fff; }
   #title { margin: 6px 0 8px; font-size: 19px; line-height: 1.2; color: #fff; }
-  #text { margin: 0 0 12px; font-size: 13.5px; line-height: 1.55; color: #c9d8cf; white-space: pre-line; }
-  #dots { display: flex; gap: 5px; margin-bottom: 12px; flex-wrap: wrap; }
+  #text { margin: 0 0 10px; font-size: 13.5px; line-height: 1.55; color: #c9d8cf; }
+  #text b { color: #fff; }
+  #feedback { min-height: 20px; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+  #feedback.ok { color: #57c98f; } #feedback.bad { color: #e8746b; }
+  #dots { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
   #dots span { width: 9px; height: 9px; border-radius: 50%; background: #2b3a33; }
   #dots span.on { background: #57c98f; }
   #btns { display: flex; gap: 8px; }
-  button {
-    flex: 1; padding: 11px 8px; border-radius: 12px; border: 1px solid #3d5a4b;
-    background: #16241d; color: #dfeee5; font-size: 14px; font-weight: 600; cursor: pointer;
-  }
+  button.nav { flex: 1; padding: 11px 8px; border-radius: 12px; border: 1px solid #3d5a4b; background: #16241d; color: #dfeee5; font-size: 14px; font-weight: 600; cursor: pointer; }
   button#next { background: #1f7a52; border-color: #1f7a52; }
   button:disabled { opacity: .35; cursor: default; }
-  #hint { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); color: #9fb4a8;
-    font-size: 12px; background: rgba(14,24,20,.8); padding: 7px 14px; border-radius: 999px; z-index: 10; }
   a { color: #7fd0a5; }
-  @media (max-width: 640px) { #card { top: auto; bottom: 56px; } #hint { bottom: 10px; font-size: 11px; } }
+  #legend { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    background: rgba(14,24,20,.85); padding: 7px 14px; border-radius: 999px; z-index: 10; }
+  #legend span { color: #c9d8cf; font-size: 12px; display: inline-flex; align-items: center; gap: 5px; }
+  #legend i { width: 14px; height: 6px; border-radius: 3px; display: inline-block; }
+  @media (max-width: 640px) { #card { top: auto; bottom: 52px; max-height: 52vh; overflow-y: auto; } #legend { font-size: 10px; gap: 8px; } }
 </style>
 </head>
 <body>
 <div id="card">
-  <div id="stepNum"></div>
+  <div id="topRow">
+    <div id="stepNum"></div>
+    <button id="practiceBtn">🎓 Modo práctica</button>
+  </div>
   <h1 id="title"></h1>
   <p id="text"></p>
+  <div id="feedback"></div>
   <div id="dots"></div>
   <div id="btns">
-    <button id="prev">◀ Atrás</button>
-    <button id="next">Siguiente ▶</button>
+    <button class="nav" id="prev">◀ Atrás</button>
+    <button class="nav" id="next">Siguiente ▶</button>
   </div>
 </div>
-<div id="hint">Arrastra para rotar · Rueda o pellizco para acercar</div>
+<div id="legend">
+  <span><i style="background:#d23c3c"></i>5V (+)</span>
+  <span><i style="background:#3a3a3a;outline:1px solid #666"></i>GND (−)</span>
+  <span><i style="background:#3567d2"></i>datos del sensor</span>
+  <span><i style="background:#d2b23c"></i>señal / órdenes</span>
+  <span><i style="background:#2fa05a"></i>Bluetooth</span>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 if (typeof THREE === "undefined") {
-  document.getElementById("text").textContent = "No se pudo cargar el motor 3D. Revisa tu conexión a internet y recarga.";
+  document.getElementById("text").textContent = "No se pudo cargar el motor 3D. Conéctate a internet y recarga la página.";
 } else {
-// ---------- Escena ----------
+// ============================ ESCENA BASE ============================
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x10161a);
-scene.fog = new THREE.Fog(0x10161a, 30, 70);
+scene.fog = new THREE.Fog(0x10161a, 34, 75);
 const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, .1, 200);
-camera.position.set(14, 14, 20);
+camera.position.set(14, 13, 20);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 document.body.appendChild(renderer.domElement);
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; controls.maxPolarAngle = Math.PI/2.05; controls.minDistance = 5; controls.maxDistance = 55;
-scene.add(new THREE.AmbientLight(0xffffff, .55));
-const dir = new THREE.DirectionalLight(0xffffff, .9); dir.position.set(10, 18, 8); scene.add(dir);
-const dir2 = new THREE.DirectionalLight(0xaad4ff, .35); dir2.position.set(-12, 8, -10); scene.add(dir2);
-// mesa
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI/2.05; controls.minDistance = 5; controls.maxDistance = 60;
+scene.add(new THREE.AmbientLight(0xffffff, .6));
+const sun = new THREE.DirectionalLight(0xffffff, .95); sun.position.set(10, 18, 8); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xaad4ff, .35); fill.position.set(-12, 8, -10); scene.add(fill);
 const mesa = new THREE.Mesh(new THREE.BoxGeometry(60, .3, 40), new THREE.MeshStandardMaterial({ color: 0x27313a, roughness: .9 }));
 mesa.position.y = -.15; scene.add(mesa);
 
-const focusables = {};   // objetos que se pueden resaltar
-const stepObjects = {};  // objetos que aparecen a partir de cierto paso
+const focusables = {};   // nombre -> grupo (para resaltar y para el quiz)
+const shown = {};        // nombre -> paso en que aparece
 function track(obj, name, step) {
-  obj.traverse(o => { o.userData.root = obj; });
-  if (name) focusables[name] = obj;
-  if (step) stepObjects[name] = { obj, step };
+  if (name) { focusables[name] = obj; obj.userData.quizName = name; }
+  if (step) shown[name] = step;
   scene.add(obj); return obj;
 }
-const mat = (c, e) => new THREE.MeshStandardMaterial({ color: c, roughness: .55, metalness: .1, emissive: e || 0x000000 });
+const mat = c => new THREE.MeshStandardMaterial({ color: c, roughness: .55, metalness: .08 });
 
-// ---------- Arduino Uno ----------
+// ============================ ETIQUETAS FLOTANTES ============================
+function label(text, pos, big) {
+  const c = document.createElement("canvas"); c.width = 512; c.height = 128;
+  const g = c.getContext("2d");
+  g.fillStyle = "rgba(8,18,14,.88)";
+  const w = g.measureText(text).width;
+  g.beginPath(); g.roundRect ? g.roundRect(4, 20, 504, 88, 24) : g.rect(4, 20, 504, 88); g.fill();
+  g.strokeStyle = "#3d5a4b"; g.lineWidth = 4; g.stroke();
+  g.fillStyle = big ? "#ffd872" : "#7fd0a5"; g.font = `bold ${big ? 52 : 46}px sans-serif`;
+  g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, 256, 66);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true }));
+  s.scale.set(big ? 4.6 : 3.4, big ? 1.15 : .85, 1);
+  s.position.set(...pos); s.raycast = function(){}; scene.add(s); return s;
+}
+
+// ============================ ARDUINO UNO R3 ============================
 const arduino = new THREE.Group();
-const pcb = new THREE.Mesh(new THREE.BoxGeometry(5.6, .18, 2.6), mat(0x00838a)); pcb.position.y = .09; arduino.add(pcb);
-const usb = new THREE.Mesh(new THREE.BoxGeometry(1.0, .55, .7), mat(0xb8bcc0, 0x30343a)); usb.position.set(-2.35, .35, 0); arduino.add(usb);
-const jack = new THREE.Mesh(new THREE.BoxGeometry(.9, .5, .75), mat(0x1a1a1a)); jack.position.set(2.25, .35, 0); arduino.add(jack);
-const header1 = new THREE.Mesh(new THREE.BoxGeometry(3.6, .3, .34), mat(0x141414)); header1.position.set(-.5, .28, 1.15); arduino.add(header1);
-const header2 = new THREE.Mesh(new THREE.BoxGeometry(1.4, .3, .34), mat(0x141414)); header2.position.set(-2.45, .28, .55); arduino.add(header2);
+const pcb = new THREE.Mesh(new THREE.BoxGeometry(5.8, .18, 2.7), mat(0x00838a)); pcb.position.y = .09; arduino.add(pcb);
+const usb = new THREE.Mesh(new THREE.BoxGeometry(1.05, .6, .75), mat(0xb8bcc0)); usb.position.set(-2.45, .4, 0); arduino.add(usb);
+const usbTop = new THREE.Mesh(new THREE.BoxGeometry(.9, .12, .6), mat(0x50565c)); usbTop.position.set(-2.45, .68, 0); arduino.add(usbTop);
+const jack = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .6, 12), mat(0x141414)); jack.rotation.z = Math.PI/2; jack.position.set(2.3, .45, 0); arduino.add(jack);
+const headerF = new THREE.Mesh(new THREE.BoxGeometry(4.0, .3, .38), mat(0x101010)); headerF.position.set(-.2, .28, 1.15); arduino.add(headerF);
+const headerL = new THREE.Mesh(new THREE.BoxGeometry(.38, .3, 1.6), mat(0x101010)); headerL.position.set(-2.7, .28, .3); arduino.add(headerL);
+const chip = new THREE.Mesh(new THREE.BoxGeometry(1.4, .16, .5), mat(0x0a0a0a)); chip.position.set(.3, .24, -.5); arduino.add(chip);
+const resetBtn = new THREE.Mesh(new THREE.CylinderGeometry(.14, .14, .1, 12), mat(0xd8d8d8)); resetBtn.position.set(-1.6, .24, -.9); arduino.add(resetBtn);
 arduino.position.set(-5.5, 0, -5.4); track(arduino, "arduino");
 
-// pines del Arduino (coordenadas mundo, sobre el header frontal)
+// pines del Arduino: bolitas de color + etiqueta (clicables en modo práctica)
 const PIN = {
-  "5V":  [-8.1, .5, -4.2], "GND": [-7.65, .5, -4.2],
-  "D2":  [-6.6, .5, -4.2], "D3":  [-6.15, .5, -4.2], "D4": [-5.7, .5, -4.2], "D5": [-5.25, .5, -4.2],
-  "D8":  [-4.35, .5, -4.2], "D10": [-3.9, .5, -4.2], "D11": [-3.45, .5, -4.2]
+  "5V":  [-8.0, .55, -4.22, 0xd23c3c],  "GND": [-7.5, .55, -4.22, 0x3a3a3a],
+  "D2":  [-6.7, .55, -4.22, 0xe8c84a],  "D3":  [-6.2, .55, -4.22, 0xe8c84a],
+  "D4":  [-5.7, .55, -4.22, 0xe8c84a],  "D5":  [-5.2, .55, -4.22, 0xe8c84a],
+  "D8":  [-4.7, .55, -4.22, 0xe8c84a],  "D10": [-4.2, .55, -4.22, 0xe8c84a],
+  "D11": [-3.7, .55, -4.22, 0xe8c84a]
 };
-function pinLabel(text, pos) {
-  const c = document.createElement("canvas"); c.width = 128; c.height = 64;
-  const g = c.getContext("2d");
-  g.fillStyle = "rgba(10,20,16,.85)"; g.fillRect(0, 0, 128, 64);
-  g.fillStyle = "#7fd0a5"; g.font = "bold 34px sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
-  g.fillText(text, 64, 34);
-  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true }));
-  s.scale.set(1.1, .55, 1); s.position.set(pos[0], pos[1] + .55, pos[2]); scene.add(s);
+for (const k in PIN) {
+  const [x, y, z, c] = PIN[k];
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(.11, 12, 10), mat(c));
+  dot.position.set(x, y, z); dot.userData.quizName = "pin-" + k; scene.add(dot); focusables["pin-" + k] = dot;
+  label(k, [x, y + .62, z]);
 }
-for (const k in PIN) pinLabel(k, PIN[k]);
+label("ARDUINO UNO R3  (el cerebro 🧠)", [-5.5, 2.4, -5.4], true);
 
-// ---------- Protoboard ----------
-const bb = new THREE.Mesh(new THREE.BoxGeometry(13, .35, 7.4), mat(0xf2f0e8)); bb.position.set(0, .17, .8); track(bb, "protoboard");
-const railM = c => new THREE.MeshStandardMaterial({ color: c, roughness: .5 });
-[[-3.35, 0xd23c3c], [-3.0, 0x2b3a45], [3.0, 0xd23c3c], [3.35, 0x2b3a45]].forEach(([z, c]) => {
-  const r = new THREE.Mesh(new THREE.BoxGeometry(12.4, .06, .16), railM(c));
-  r.position.set(0, .38, .8 + z); scene.add(r);
+// ============================ PROTOBOARD ============================
+const bb = new THREE.Mesh(new THREE.BoxGeometry(13, .35, 7.6), mat(0xf2f0e8)); bb.position.set(0, .17, .8); track(bb, "protoboard");
+const chan = new THREE.Mesh(new THREE.BoxGeometry(12.6, .06, .35), mat(0xd9d5c8)); chan.position.set(0, .36, .8); scene.add(chan);
+[[-3.55, 0xd23c3c], [-3.2, 0x2b4a5a], [3.2, 0xd23c3c], [3.55, 0x2b4a5a]].forEach(([z, c]) => {
+  const r = new THREE.Mesh(new THREE.BoxGeometry(12.4, .07, .2), mat(c));
+  r.position.set(0, .37, .8 + z); scene.add(r);
 });
-const holeGeo = new THREE.CylinderGeometry(.035, .035, .06, 6);
-const holeMat = mat(0x8a8a80);
-const holes = new THREE.InstancedMesh(holeGeo, holeMat, 25*11);
-let hi = 0; const M = new THREE.Matrix4();
-for (let x = -6; x <= 6; x += .5) for (let z = -2.6; z <= 2.6; z += .5) {
-  M.setPosition(x, .37, .8 + z); holes.setMatrixAt(hi++, M);
-}
+const holeCount = 25 * 11;
+const holes = new THREE.InstancedMesh(new THREE.CylinderGeometry(.045, .045, .08, 6), mat(0x7c7c72), holeCount);
+let hi = 0; const Mx = new THREE.Matrix4();
+for (let x = -6; x <= 6; x += .5) for (let z = -2.7; z <= 2.7; z += .54) { Mx.setPosition(x, .37, .8 + z); holes.setMatrixAt(hi++, Mx); }
 scene.add(holes);
+label("+  (5V)", [-5.4, .8, .8 - 3.55]); label("−  (GND)", [-5.4, .8, .8 - 3.2]);
+label("+  (5V)", [-5.4, .8, .8 + 3.2]); label("−  (GND)", [-5.4, .8, .8 + 3.55]);
+label("PROTOBOARD (la parrilla de huequitos)", [0, 2.1, .8 - 4.4], true);
 
-// ---------- Componentes ----------
-// DHT11
+// ============================ COMPONENTES ============================
+// DHT11 — el termómetro
 const dht = new THREE.Group();
-const dhtBody = new THREE.Mesh(new THREE.BoxGeometry(1.25, 1.05, .85), mat(0x2f6fb2)); dhtBody.position.y = .85; dht.add(dhtBody);
-[[.35, 0xe8e4d8], [-.35, 0xe8e4d8], [0, 0xcfd8dc]].forEach(([x, c]) => {
-  const l = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, .6, 6), mat(c));
-  l.position.set(x, .3, 0); dht.add(l);
-});
-dht.position.set(4.6, .35, -1.7); track(dht, "dht", 3);
-// LEDs
+const dhtBody = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.1, .9), mat(0x2f6fb2)); dhtBody.position.y = .9; dht.add(dhtBody);
+for (let i = -1; i <= 1; i++) {
+  const slit = new THREE.Mesh(new THREE.BoxGeometry(.16, .5, .06), mat(0x1d4a80));
+  slit.position.set(i * .35, 1.05, .46); dht.add(slit);
+}
+[.42, -.42, 0].forEach(x => { const l = new THREE.Mesh(new THREE.CylinderGeometry(.045, .045, .65, 6), mat(0xd8d4c8)); l.position.set(x, .32, 0); dht.add(l); });
+dht.position.set(4.8, .35, -1.8); track(dht, "dht", 4);
+label("DHT11 · termómetro 🌡️", [4.8, 2.35, -1.8]);
+
+// LEDs — la carita del semáforo
 function led(x, color, name, step) {
   const g = new THREE.Group();
-  const dome = new THREE.Mesh(new THREE.SphereGeometry(.32, 18, 12), mat(color, 0x000000)); dome.position.y = .85; g.add(dome);
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .5, 18), mat(color)); base.position.y = .55; g.add(base);
-  const legA = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .75, 6), mat(0xcccccc)); legA.position.set(-.18, .1, 0); g.add(legA);
-  const legC = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .55, 6), mat(0xcccccc)); legC.position.set(.18, .2, 0); g.add(legC);
-  g.position.set(x, .35, -1.2); track(g, name, step); return g;
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(.34, 18, 12), mat(color)); dome.position.y = .95; g.add(dome);
+  const ring = new THREE.Mesh(new THREE.CylinderGeometry(.36, .36, .12, 18), mat(0xb8bcc0)); ring.position.y = .62; g.add(ring);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .45, 18), mat(color)); base.position.y = .38; g.add(base);
+  const legA = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, .8, 6), mat(0xd8d8d8)); legA.position.set(-.2, .05, 0); g.add(legA);
+  const legC = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, .6, 6), mat(0xd8d8d8)); legC.position.set(.2, .15, 0); g.add(legC);
+  g.position.set(x, .35, -1.3); track(g, name, step);
 }
-led(-4.3, 0x35d07c, "ledVerde", 4);
-led(-3.0, 0xf2c23e, "ledAmarillo", 5);
-led(-1.7, 0xe8564d, "ledRojo", 6);
-// Resistencias
-function resistor(x, z1, z2, name, step, bands) {
+led(-4.5, 0x35d07c, "ledVerde", 5);
+led(-3.1, 0xf2c23e, "ledAmarillo", 6);
+led(-1.7, 0xe8564d, "ledRojo", 7);
+label("LED VERDE · D3", [-4.5, 1.95, -1.3]); label("LED AMARILLO · D4", [-3.1, 1.95, -1.3]); label("LED ROJO · D5", [-1.7, 1.95, -1.3]);
+label("pata LARGA (+) 😊", [-4.85, .6, -.55]);
+
+// Resistencias — el freno de la corriente
+function resistor(x, z1, z2, name, step, bands, txt, ty) {
   const g = new THREE.Group();
   const len = Math.abs(z2 - z1);
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, len*.62, 10), mat(0xd8b98a));
-  body.rotation.x = Math.PI/2; body.position.set(0, .16, (z1+z2)/2); g.add(body);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(.11, .11, len*.55, 10), mat(0xd8b98a));
+  body.rotation.x = Math.PI/2; body.position.set(0, .18, (z1+z2)/2); g.add(body);
   bands.forEach((c, i) => {
-    const b = new THREE.Mesh(new THREE.CylinderGeometry(.1, .1, .08, 10), mat(c));
-    b.rotation.x = Math.PI/2; b.position.set(0, .16, (z1+z2)/2 - len*.18 + i*.14); g.add(b);
+    const b = new THREE.Mesh(new THREE.CylinderGeometry(.125, .125, .1, 10), mat(c));
+    b.rotation.x = Math.PI/2; b.position.set(0, .18, (z1+z2)/2 - len*.16 + i*.16); g.add(b);
   });
-  [[z1, len*.19], [z2, len*.19]].forEach(([z]) => {
-    const wire = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, Math.abs(z2-z1) - len*.62 + .3, 6), mat(0xb8b8b8));
-    wire.rotation.x = Math.PI/2; wire.position.set(0, .16, (z1+z2)/2); g.add(wire);
-  });
+  const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, len*.45, 6), mat(0xb8b8b8));
+  leg1.rotation.x = Math.PI/2; leg1.position.set(0, .18, z1 + len*.225); g.add(leg1);
+  const leg2 = leg1.clone(); leg2.position.z = z2 - len*.225; g.add(leg2);
   g.position.set(x, .35, 0); track(g, name, step);
+  label(txt, [x, ty || 1.6, .8 + (z1+z2)/2]);
 }
-resistor(-4.48, -1.2, .4, "r220v", 4, [0x8a4b2a, 0xd23c3c, 0x8a4b2a]);   // 220Ω rojo-rojo-café
-resistor(-3.18, -1.2, .4, "r220a", 5, [0x8a4b2a, 0xd23c3c, 0x8a4b2a]);
-resistor(-1.88, -1.2, .4, "r220r", 6, [0x8a4b2a, 0xd23c3c, 0x8a4b2a]);
-resistor(2.2, .2, 1.3, "r1k", 9, [0x8a4b2a, 0x141414, 0xd23c3c]);        // 1 kΩ café-negro-rojo
-resistor(2.2, 1.3, 2.5, "r2k", 9, [0xd23c3c, 0x141414, 0xd23c3c]);       // 2 kΩ rojo-negro-rojo
-// Módulo relé
-const relay = new THREE.Group();
-const rbox = new THREE.Mesh(new THREE.BoxGeometry(2.3, 1.05, 1.6), mat(0x1f5fa8)); rbox.position.y = .55; relay.add(rbox);
-const rcube = new THREE.Mesh(new THREE.BoxGeometry(.9, .6, .7), mat(0x2b7fd4, 0x0a2036)); rcube.position.set(.35, .9, 0); relay.add(rcube);
-[-.55, -.15, .25].forEach((x, i) => {
-  const s = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .2, 10), mat(0xb8bcc0, 0x40484e));
-  s.position.set(x, .25, -.82); relay.add(s);
-});
-relay.position.set(9.4, 0, -.6); track(relay, "relay", 7);
-// HC-05
-const hc = new THREE.Group();
-const pcb2 = new THREE.Mesh(new THREE.BoxGeometry(1.7, .12, .95), mat(0x14532d)); pcb2.position.y = .4; hc.add(pcb2);
-const can = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .45, 14), mat(0xb8bcc0, 0x40484e));
-can.rotation.x = Math.PI/2; can.position.set(-.2, .68, 0); hc.add(can);
-const botton = new THREE.Mesh(new THREE.CylinderGeometry(.14, .14, .1, 12), mat(0xd8d8d8));
-botton.position.set(.55, .5, .25); hc.add(botton);
-hc.position.set(3.4, .35, 1.7); track(hc, "hc05", 8);
+resistor(-4.72, -1.3, .5, "r220v", 5, [0x8a4b2a, 0xd23c3c, 0x8a4b2a], "220Ω", 1.35);
+resistor(-3.32, -1.3, .5, "r220a", 6, [0x8a4b2a, 0xd23c3c, 0x8a4b2a], "220Ω", 1.35);
+resistor(-1.92, -1.3, .5, "r220r", 7, [0x8a4b2a, 0xd23c3c, 0x8a4b2a], "220Ω", 1.35);
+resistor(2.3, .3, 1.45, "r1k", 10, [0x8a4b2a, 0x141414, 0xd23c3c], "1 kΩ", 1.5);
+resistor(2.3, 1.45, 2.6, "r2k", 10, [0xd23c3c, 0x141414, 0xd23c3c], "2 kΩ", 1.5);
 
-// ---------- Cables ----------
-const WIREC = { rojo: 0xd23c3c, negro: 0x242424, azul: 0x3567d2, amarillo: 0xd2b23c, verde: 0x2fa05a };
-const wires = [];
+// Módulo relé — el interruptor de la bomba
+const relay = new THREE.Group();
+const rbox = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.15, 1.7), mat(0x1f5fa8)); rbox.position.y = .62; relay.add(rbox);
+const rcube = new THREE.Mesh(new THREE.BoxGeometry(.95, .65, .75), mat(0x2b7fd4)); rcube.position.set(.3, 1.05, 0); relay.add(rcube);
+[-.6, -.2, .2].forEach(x => {
+  const s = new THREE.Mesh(new THREE.CylinderGeometry(.1, .1, .22, 10), mat(0xb8bcc0));
+  s.position.set(x, .3, -.9); relay.add(s);
+});
+const rled = new THREE.Mesh(new THREE.SphereGeometry(.09, 10, 8), mat(0xe8564d, 0x000000)); rled.position.set(.75, .95, .8); relay.add(rled);
+relay.position.set(9.6, 0, -.7); track(relay, "relay", 8);
+label("RELÉ · interruptor de la bomba 💦", [9.6, 2.5, -.7], true);
+
+// HC-05 — el oído y la boca Bluetooth
+const hc = new THREE.Group();
+const pcb2 = new THREE.Mesh(new THREE.BoxGeometry(1.8, .14, 1.0), mat(0x14532d)); pcb2.position.y = .42; hc.add(pcb2);
+const shield = new THREE.Mesh(new THREE.BoxGeometry(1.05, .3, .7), mat(0xb8bcc0)); shield.position.set(-.15, .62, 0); hc.add(shield);
+const ant = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 1.0, 10), mat(0x8a8f94));
+ant.rotation.x = Math.PI/2; ant.position.set(-.15, .62, -.45); hc.add(ant);
+const btn = new THREE.Mesh(new THREE.CylinderGeometry(.15, .15, .1, 12), mat(0xd8d8d8)); btn.position.set(.62, .52, .25); hc.add(btn);
+for (let i = 0; i < 6; i++) {
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(.045, .045, .3, 6), mat(0xd4b24a));
+  p.position.set(-.5 + i * .3, .22, -.3); hc.add(p);
+}
+hc.position.set(3.6, .35, 1.8); track(hc, "hc05", 9);
+label("HC-05 · Bluetooth 📡", [3.6, 2.15, 1.8]);
+
+// ============================ CABLES ============================
+const WIREC = { rojo: 0xd23c3c, negro: 0x2e2e2e, azul: 0x3567d2, amarillo: 0xd2b23c, verde: 0x2fa05a };
 function wire(a, b, color, step, name) {
   const va = new THREE.Vector3(...a), vb = new THREE.Vector3(...b);
-  const mid = va.clone().add(vb).multiplyScalar(.5); mid.y = Math.max(va.y, vb.y) + 1.1;
-  const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([va, mid, vb]), 24, .06, 8), mat(WIREC[color]));
-  tube.userData.step = step; scene.add(tube); wires.push(tube); if (name) focusables[name] = tube;
-  return tube;
+  const mid = va.clone().add(vb).multiplyScalar(.5); mid.y = Math.max(va.y, vb.y) + 1.2;
+  const g = new THREE.Group();
+  const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([va, mid, vb]), 24, .075, 8), mat(WIREC[color]));
+  g.add(tube);
+  [va, vb].forEach(p => {
+    const end = new THREE.Mesh(new THREE.SphereGeometry(.11, 10, 8), mat(WIREC[color]));
+    end.position.copy(p); g.add(end);
+  });
+  g.userData.step = step; scene.add(g);
+  wires.push(g); if (name) focusables[name] = g;
+  return g;
 }
-const B = (x, z) => [x, .42, .8 + z];     // punto en un hueco de la protoboard
-const RAILR = [0, .42, .8 - 3.35], RAILR2 = [0, .42, .8 + 3.0], RAILB = [0, .42, .8 - 3.0], RAILB2 = [0, .42, .8 + 3.35];
-// paso 2: alimentación
-wire([-6.9, .5, -4.3], [-3.5, .42, .8 - 3.32], "rojo", 2, "w5v");
-wire([-6.5, .5, -4.3], [-3.0, .42, .8 - 3.32], "negro", 2, "wgnd");
-// paso 3: DHT11
-wire(B(4.35, -1.7), PIN["D2"], "azul", 3, "wdht");
-wire(B(4.6, -1.7), [-4.9, .42, .8 - 3.02], "rojo", 3);
-wire(B(4.85, -1.7), [-4.4, .42, .8 - 3.32], "negro", 3);
-// pasos 4-6: LEDs (ánodo → resistencia → D; cátodo → GND)
-[[-4.3, -4.48, "D3", 4], [-3.0, -3.18, "D4", 5], [-1.7, -1.88, "D5", 6]].forEach(([x, rx, pin, st]) => {
-  wire(B(x - .18, -1.2), B(rx, .4), "amarillo", st);          // ánodo a la resistencia
-  wire(B(rx, .4), PIN[pin], "amarillo", st, "w" + pin);       // resistencia al pin
-  wire(B(x + .18, -1.2), [x + .18, .42, .8 + 3.0], "negro", st); // cátodo a riel GND
+const wires = [];
+const B = (x, z) => [x, .45, .8 + z];   // hueco de la protoboard
+// paso 3: alimentación
+wire([-7.6, .6, -4.4], [-3.6, .45, .8 - 3.5], "rojo", 3, "w5v");
+wire([-7.1, .6, -4.4], [-3.1, .45, .8 - 3.2], "negro", 3, "wgnd");
+// paso 4: DHT11
+wire(B(4.5, -1.8), [-6.55, .6, -4.4], "azul", 4, "wdht");
+wire(B(4.8, -1.8), [-5.0, .45, .8 - 3.18], "rojo", 4);
+wire(B(5.1, -1.8), [-4.4, .45, .8 - 3.5], "negro", 4);
+// pasos 5-7: LEDs — ánodo(pata larga) → resistencia → pin; cátodo → GND
+[[-4.5, -4.72, "D3", 5], [-3.1, -3.32, "D4", 6], [-1.7, -1.92, "D5", 7]].forEach(([x, rx, pin, st]) => {
+  wire(B(x - .2, -1.3), B(rx, .5), "amarillo", st);
+  wire(B(rx, .5), PIN[pin].slice(0, 3), "amarillo", st, "w" + pin);
+  wire(B(x + .2, -1.3), [x + .2, .45, .8 + 3.18], "negro", st);
 });
-// paso 7: relé
-wire(PIN["D8"], [8.85, .45, -1.42], "amarillo", 7, "wrel");
-wire([8.6, .45, .1], [2.5, .42, .8 + 3.0], "rojo", 7);
-wire([9.0, .45, .1], [2.0, .42, .8 + 3.32], "negro", 7);
-// paso 8: HC-05 alimentación y TXD
-wire(B(2.9, 1.7), [-2.2, .42, .8 - 3.02], "rojo", 8);
-wire(B(3.15, 1.7), [-1.7, .42, .8 - 3.32], "negro", 8);
-wire(B(3.9, 1.7), PIN["D10"], "amarillo", 8, "wtx");
-// paso 9: divisor RXD
-wire(PIN["D11"], B(2.2, .2), "verde", 9, "wdiv1");
-wire(B(2.2, 1.3), B(2.75, 1.7), "verde", 9, "wdiv2");
-wire(B(2.2, 2.5), [1.4, .42, .8 - 3.32], "negro", 9, "wdiv3");
+// paso 8: relé
+wire([-4.55, .6, -4.4], [9.0, .5, -1.62], "amarillo", 8, "wrel");
+wire([8.9, .5, .1], [-2.6, .45, .8 + 3.18], "rojo", 8);
+wire([9.35, .5, .1], [-2.1, .45, .8 + 3.5], "negro", 8);
+// paso 9: HC-05
+wire(B(3.05, 1.8), [-4.0, .45, .8 - 3.18], "rojo", 9);
+wire(B(3.3, 1.8), [-3.5, .45, .8 - 3.5], "negro", 9);
+wire(B(4.0, 1.8), [-4.05, .6, -4.4], "amarillo", 9, "wtx");
+// paso 10: divisor RXD
+wire([-3.55, .6, -4.4], B(2.3, .3), "verde", 10, "wdiv1");
+wire(B(2.3, 1.45), B(2.85, 1.8), "verde", 10, "wdiv2");
+wire(B(2.3, 2.6), [-2.6, .45, .8 - 3.5], "negro", 10, "wdiv3");
 
-// ---------- Pasos ----------
+// ============================ PASOS (modo cuéntaselo a un peque) ============================
 const STEPS = [
-  { t: "El tablero, de un vistazo", x: "Esto es lo que vas a armar: el Arduino Uno R3 (atrás), la protoboard y todos los módulos. Gira la escena con el dedo o el mouse para reconocer cada pieza. Avanza con «Siguiente» y cada paso resalta en verde lo que toca conectar.", cam: { p: [13, 12, 19], l: [0, 0, 0] }, hi: [] },
-  { t: "Rieles de alimentación", x: "Dos cables desde el Arduino hacia los rieles largos de la protoboard:\n• ROJO: pin 5V del Arduino → riel rojo (+).\n• NEGRO: pin GND → riel azul (−).\nTodo lo demás se alimenta desde estos rieles, nunca directo del Arduino.", cam: { p: [-9, 8, 2], l: [-5, 0, -2] }, hi: ["w5v", "wgnd"] },
-  { t: "Sensor DHT11 en D2", x: "Clava el DHT11 en la protoboard (zona derecha) y conecta:\n• Cable AZUL: pin S (datos) → hueco bajo el sensor y de ahí → pin D2.\n• ROJO: VCC → riel rojo.\n• NEGRO: GND → riel azul.\nDeja el cable de datos corto (< 30 cm).", cam: { p: [9, 7, -1], l: [3, .5, -2] }, hi: ["dht", "wdht"] },
-  { t: "LED verde + su resistencia 220Ω", x: "El LED tiene pata LARGA (ánodo +) y CORTA (cátodo −). Clávalo en dos huecos separados.\nLa resistencia 220Ω (franjas rojo-rojo-café) va EN SERIE con la pata larga: de la fila del ánodo cruza el canal central hasta la fila de arriba. Sin ella, el LED se quema.\nDespués: amarillo desde esa fila → pin D3, y negro desde la pata corta → riel azul (GND).", cam: { p: [-7.5, 6, 3.5], l: [-4.3, .5, -.8] }, hi: ["ledVerde", "r220v", "wD3"] },
-  { t: "LED amarillo en D4", x: "Igual que el anterior: LED amarillo dos filas al lado, pata larga hacia la resistencia 220Ω que cruza el canal, y de ahí:\n• Cable AMARILLO → pin D4.\n• NEGRO desde la pata corta → riel azul.", cam: { p: [-6.5, 6, 4.5], l: [-3, .5, -.8] }, hi: ["ledAmarillo", "r220a", "wD4"] },
-  { t: "LED rojo en D5", x: "Tercer LED, mismo molde: resistencia 220Ω en serie con la pata larga, cable AMARILLO desde la fila superior → pin D5, y NEGRO desde la pata corta → riel azul.\nEste es el LED de helada: es el que prende junto al CLIC del relé.", cam: { p: [-5.5, 6, 5.5], l: [-1.7, .5, -.8] }, hi: ["ledRojo", "r220r", "wD5"] },
-  { t: "Módulo relé (bomba) en D8", x: "El relé queda a la derecha de la protoboard:\n• Cable AMARILLO: pin IN del módulo → pin D8.\n• ROJO: VCC → riel rojo. NEGRO: GND → riel azul.\nLa lógica es Active LOW: LOW enciende la bomba, HIGH la apaga. Los tornillos de carga quedan VACÍOS en el laboratorio (nada de 220 V).", cam: { p: [12, 7, 4], l: [8, .5, -1] }, hi: ["relay", "wrel"] },
-  { t: "Bluetooth HC-05: alimentación y TXD", x: "Clava el HC-05 en la protoboard:\n• ROJO: VCC → riel rojo. NEGRO: GND → riel azul.\n• AMARILLO: TXD del módulo → pin D10 (aquí va DIRECTO: el módulo manda 3.3 V y el Arduino lo lee bien).\nCuando lo alimentes, su LED debe parpadear rápido.", cam: { p: [7, 6, 6], l: [3, .5, 1] }, hi: ["hc05", "wtx"] },
-  { t: "Divisor de tensión para RXD (¡no lo saltes!)", x: "El RXD del HC-05 es de 3.3 V y el Arduino manda 5 V por D11: hay que bajarle la tensión con DOS resistencias en serie:\n• D11 → cable VERDE → hueco A.\n• 1 kΩ (café-negro-rojo) del hueco A al hueco B.\n• Del hueco B → cable VERDE → RXD del módulo.\n• 2 kΩ (rojo-negro-rojo) del hueco B hacia abajo, y NEGRO → riel azul (GND).\nSin esto puedes dañar el módulo.", cam: { p: [5, 6.5, 6.5], l: [2.2, .5, 1.2] }, hi: ["r1k", "r2k", "wdiv1", "wdiv2", "wdiv3"] },
-  { t: "Revisión final", x: "Compara con la escena:\n• Verde, amarillo y rojo en D3/D4/D5 con sus 220Ω.\n• Relé IN en D8 y HC-05 en D10/D11 con el divisor.\nAl alimentar por USB: LED verde fijo, relé silencioso y el HC-05 parpadeando rápido. Si algo no coincide, vuelve al paso de esa rama.", cam: { p: [13, 12, 19], l: [0, 0, 0] }, hi: [] },
-  { t: "¡Armado! Ahora el firmware", x: "Conecta el Arduino al PC por USB y sigue la guía: docs/CABLEADO_ARDUINO.md (IDE, librería DHT, subir el sketch ya verificado).\nPrueba en el Monitor Serie a 9600: tramas TELEMETRIA cada 2 s y órdenes 1 / 0 / A con CLIC del relé.\nDespués vincula el HC-05 y sigue docs/BLUETOOTH.md con la app. ¡Éxito en la demo!", cam: { p: [13, 12, 19], l: [0, 0, 0] }, hi: [], link: "https://github.com/DarioChino/agroalert-araucania/blob/main/docs/CABLEADO_ARDUINO.md" }
+  { t: "🏁 Mira todo antes de tocar", x: "Gira la escena con el dedo 👆.\n¿Lo ves? El tablita <b>verde</b> es el <b>ARDUINO</b>. La tabla <b>blanca con huequitos</b> es la <b>PROTOBOARD</b>. Y los cacharritos de colores son los <b>módulos</b>.\nVamos a conectarlos poquito a poquito. ¡Sin apuro!", cam: { p: [13, 12, 19], l: [0, 0, 0] }, hi: [] },
+  { t: "🧠 El Arduino: el cerebro", x: "El Arduino <b>piensa</b> por todo el proyecto: mide, decide y enciende.\nArriba tiene <b>pinitas con nombre</b> (D2, D3… 5V, GND): ahí enchufamos los cables.\n👉 <b>Practica:</b> toca el Arduino en la escena.", cam: { p: [-6, 7, 1], l: [-5.5, .5, -5] }, hi: ["arduino"], quiz: { ask: "Toca el ARDUINO (la tablita verde con el USB plateado)", target: "arduino" } },
+  { t: "🧇 La protoboard: la parrilla", x: "Es una tabla llena de <b>huequitos</b> donde clavamos las patitas.\nLos huequitos de la <b>misma fila en corto</b> están unidos por adentro: la corriente viaja entre ellos.\nLas líneas de colores de los bordes son los <b>rieles</b>: rojo = 5V (+), azul = GND (−).\n👉 <b>Practica:</b> toca la protoboard.", cam: { p: [2, 9, 9], l: [0, .3, .8] }, hi: ["protoboard"], quiz: { ask: "Toca la PROTOBOARD (la tabla blanca)", target: "protoboard" } },
+  { t: "⚡ Primero: la comida (5V y GND)", x: "Todo módulo necesita «comer» electricidad:\n• Cable <b>ROJO</b>: del pin <b>5V</b> del Arduino → al riel <b>rojo</b>.\n• Cable <b>NEGRO</b>: del pin <b>GND</b> → al riel <b>azul</b>.\nAhora todos los módulos pueden comer de esos rieles. 🍽️\n👉 <b>Practica:</b> toca el pin <b>5V</b> del Arduino.", cam: { p: [-9, 7, 1], l: [-5.5, .4, -3.5] }, hi: ["w5v", "wgnd"], quiz: { ask: "Toca el pin 5V del Arduino (la bolita ROJA con su nombre)", target: "pin-5V" } },
+  { t: "🌡️ El DHT11: el termómetro", x: "Este cubito <b>azul</b> siente el frío y el calor del huerto.\n• Cable <b>AZUL</b>: pin S (datos) → pin <b>D2</b> («aquí te cuento lo que siento»).\n• <b>ROJO</b>: VCC → riel rojo. <b>NEGRO</b>: GND → riel azul.\n👉 <b>Practica:</b> toca el termómetro.", cam: { p: [9, 7, -1], l: [4.5, .8, -2] }, hi: ["dht", "wdht"], quiz: { ask: "Toca el DHT11 (el cubito AZUL)", target: "dht" } },
+  { t: "🟢 El LED verde: «todo tranqui»", x: "Un LED tiene pata <b>LARGA</b> (+, ánodo) y pata <b>CORTA</b> (−, cátodo).\nLa resistencia <b>220Ω</b> (franjas café-rojo-café) va en la fila de la pata larga: es un <b>freno</b> para que no se queme. 🔥🚫\nLuego: cable <b>AMARILLO</b> desde esa fila → pin <b>D3</b>, y <b>NEGRO</b> desde la pata corta → riel azul.\n👉 <b>Practica:</b> toca el LED verde.", cam: { p: [-7.5, 6, 3.5], l: [-4.5, .5, -1] }, hi: ["ledVerde", "r220v", "wD3"], quiz: { ask: "Toca el LED VERDE (la bolita verde con patitas)", target: "ledVerde" } },
+  { t: "🟡 El LED amarillo: «¡abrígate!»", x: "Mismo juguete, una fila al lado: resistencia <b>220Ω</b> en la pata larga, cable <b>AMARILLO</b> → pin <b>D4</b>, y NEGRO de la pata corta → riel azul.\nPrende cuando empieza a refrescar (5-10 °C).", cam: { p: [-6.5, 6, 4.5], l: [-3.1, .5, -1] }, hi: ["ledAmarillo", "r220a", "wD4"], quiz: { ask: "Toca el LED AMARILLO", target: "ledAmarillo" } },
+  { t: "🔴 El LED rojo: «¡HELADA!»", x: "El tercer LED, mismo molde: resistencia 220Ω, cable <b>AMARILLO</b> → pin <b>D5</b>, NEGRO → riel azul.\nCuando prende este, el relé hace <b>CLIC</b> y arranca la bomba. 💦", cam: { p: [-5.5, 6, 5.5], l: [-1.7, .5, -1] }, hi: ["ledRojo", "r220r", "wD5"], quiz: { ask: "Toca el LED ROJO", target: "ledRojo" } },
+  { t: "💦 El relé: el interruptor de la bomba", x: "El relé es un <b>interruptor</b> que el Arduino aprieta solito:\n• Cable <b>AMARILLO</b>: pin IN → <b>D8</b> («cuando haya helada, aprieta»).\n• ROJO: VCC → riel rojo. NEGRO: GND → riel azul.\nAl activarse hace <b>CLIC</b> 🔊. Los tornillos grandes quedan <b>VACÍOS</b> (¡nada de 220V en el banco!).", cam: { p: [12, 7, 4], l: [8.5, .6, -1] }, hi: ["relay", "wrel"], quiz: { ask: "Toca el MÓDULO RELÉ (el cubito azul con tornillos)", target: "relay" } },
+  { t: "📡 El HC-05: el oído y la boca", x: "Este módulo <b>escucha</b> tu celular y <b>habla</b> con él:\n• ROJO: VCC → riel rojo. NEGRO: GND → riel azul.\n• Cable <b>AMARILLO</b>: TXD del módulo → pin <b>D10</b> (va directo, sin freno).\nSu lucecita parpadea rápido cuando espera conexión. ✨", cam: { p: [7, 6, 6], l: [3.6, .6, 1.5] }, hi: ["hc05", "wtx"], quiz: { ask: "Toca el HC-05 (la tarjetita verde con tapita plateada)", target: "hc05" } },
+  { t: "🛑 El freno del RXD (¡MUY importante!)", x: "El Arduino grita a <b>5V</b> y el HC-05 solo aguanta <b>3.3V</b> en su oreja (RXD). Le ponemos DOS frenos en fila:\n• Cable <b>VERDE</b>: pin <b>D11</b> → hueco A.\n• <b>1 kΩ</b> (café-negro-rojo) del hueco A al B.\n• Del hueco B → cable <b>VERDE</b> → RXD.\n• <b>2 kΩ</b> (rojo-negro-rojo) del hueco B hacia abajo y NEGRO → riel azul.\nSin este freno, el HC-05 se puede dañar. 😱", cam: { p: [5, 6.5, 6.5], l: [2.3, .5, 1.3] }, hi: ["r1k", "r2k", "wdiv1", "wdiv2", "wdiv3"], quiz: { ask: "Toca el pin D11 del Arduino (de donde sale el cable verde)", target: "pin-D11" } },
+  { t: "✅ Revisión con la escena", x: "Compara tu mesa con el 3D:\n• 3 LEDs con sus 220Ω en D3, D4 y D5.\n• Relé con IN en D8.\n• HC-05 en D10/D11 con sus 2 frenos.\nAl enchufar el USB: LED <b>verde</b> fijo, relé callado y HC-05 <b>parpadeando rápido</b>. Si algo no coincide, vuelve a ese paso. 🔍", cam: { p: [13, 12, 19], l: [0, 0, 0] }, hi: [] },
+  { t: "🎉 ¡Armado! Ahora el cerebro necesita su programa", x: "Conecta el Arduino al PC por USB y sube el firmware siguiendo <b>docs/CABLEADO_ARDUINO.md</b> (ahí está la guía del IDE y la librería DHT).\nLuego: Monitor Serie a <b>9600</b> para ver las tramas, y después a <b>emparejar el HC-05</b> con la app (docs/BLUETOOTH.md).\n¡Éxito en la demo, campeón! 🏆", cam: { p: [13, 12, 19], l: [0, 0, 0] }, hi: [], link: "https://github.com/DarioChino/agroalert-araucania/blob/main/docs/CABLEADO_ARDUINO.md" }
 ];
 
-// ---------- Visibilidad por paso ----------
+// ============================ VISIBILIDAD ============================
 function applyStep(i) {
-  for (const k in stepObjects) stepObjects[k].obj.visible = i >= stepObjects[k].step;
+  for (const name in shown) focusables[name].visible = i >= shown[name];
   wires.forEach(w => w.visible = i >= w.userData.step);
 }
 applyStep(0);
 
-// ---------- UI ----------
+// ============================ UI + QUIZ ============================
 const $ = id => document.getElementById(id);
-let cur = 0;
+let cur = 0, practice = false, solved = false;
 $("dots").innerHTML = STEPS.map(() => "<span></span>").join("");
+function feedback(txt, cls) { const f = $("feedback"); f.textContent = txt; f.className = cls || ""; }
 function show(i) {
   cur = Math.max(0, Math.min(STEPS.length - 1, i));
-  const s = STEPS[cur];
+  const s = STEPS[cur]; solved = false; feedback("");
   $("stepNum").textContent = `PASO ${cur+1} DE ${STEPS.length}`;
   $("title").textContent = s.t;
-  $("text").innerHTML = s.x.replace(/\n/g, "<br>") + (s.link ? `<br><br><a href="${s.link}" target="_blank">Abrir guía de compilación ▸</a>` : "");
+  let body = practice && s.quiz ? `🎓 <b>PRACTICA:</b> ${s.quiz.ask}` : s.x;
+  $("text").innerHTML = body + (s.link ? `<br><br><a href="${s.link}" target="_blank">Abrir guía de compilación ▸</a>` : "");
   $("prev").disabled = cur === 0;
   $("next").textContent = cur === STEPS.length - 1 ? "↻ Volver al inicio" : "Siguiente ▶";
   [...$("dots").children].forEach((d, k) => d.className = k <= cur ? "on" : "");
@@ -258,25 +314,52 @@ function show(i) {
 }
 $("prev").onclick = () => show(cur - 1);
 $("next").onclick = () => show(cur === STEPS.length - 1 ? 0 : cur + 1);
+$("practiceBtn").onclick = () => { practice = !practice; $("practiceBtn").className = practice ? "on" : ""; show(cur); };
 addEventListener("keydown", e => { if (e.key === "ArrowRight") show(cur + 1); if (e.key === "ArrowLeft") show(cur - 1); });
 show(0);
 
-// ---------- Animación ----------
-const camTarget = new THREE.Vector3(0, 0, 0), camPos = new THREE.Vector3(13, 12, 19);
-const pulse = new THREE.Color(0x57c98f);
-let t0 = 0;
+// clic para el modo práctica (distingue clic de arrastre)
+const ray = new THREE.Raycaster(); let downXY = null;
+renderer.domElement.addEventListener("pointerdown", e => downXY = [e.clientX, e.clientY]);
+renderer.domElement.addEventListener("pointerup", e => {
+  if (!practice || !downXY) return;
+  const dx = e.clientX - downXY[0], dy = e.clientY - downXY[1];
+  downXY = null;
+  if (Math.hypot(dx, dy) > 6) return;               // fue arrastre, no clic
+  const ndc = new THREE.Vector2(e.clientX/innerWidth*2 - 1, -(e.clientY/innerHeight)*2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hits = ray.intersectObjects(scene.children, true);
+  for (const h of hits) {
+    let o = h.object;
+    while (o && !o.userData.quizName) o = o.parent;
+    const name = o ? o.userData.quizName : null;
+    const s = STEPS[cur];
+    if (s.quiz && name === s.quiz.target) {
+      solved = true; feedback("¡BIEN! 🎉 Era eso. Toca «Siguiente».", "ok"); applyStep(cur); return;
+    }
+    if (name) { feedback("Casi… intenta otra vez 😉", "bad"); return; }
+  }
+  feedback("Toca una pieza con etiqueta 😉", "bad");
+});
+
+// ============================ ANIMACIÓN ============================
+const camPos = new THREE.Vector3(14, 13, 20), camTarget = new THREE.Vector3(0, 0, 0);
+const mats = [];
+for (const n in focusables) focusables[n].traverse(o => { if (o.material && o.material.emissive) mats.push([o.material, 0]); });
+mats.forEach(([m]) => m.userData.e0 = m.emissive ? m.emissive.getHex() : 0);
 function animate(t) {
   requestAnimationFrame(animate);
   const s = STEPS[cur];
   camPos.lerp(new THREE.Vector3(...s.cam.p), .06);
   camTarget.lerp(new THREE.Vector3(...s.cam.l), .06);
   camera.position.copy(camPos); controls.target.copy(camTarget);
-  const k = (Math.sin((t - t0) * .005) + 1) / 2;
-  for (const name in focusables) {
-    const obj = focusables[name];
-    const on = (s.hi || []).includes(name);
-    obj.traverse(o => { if (o.material && o.material.emissive) o.material.emissive.setHex(on ? pulse.getHex() : (o.userData.e0 || 0)); if (o.material && o.material.emissive && o.userData.e0 === undefined) o.userData.e0 = o.material.emissive.getHex(); });
-    if (on) obj.traverse(o => { if (o.material && o.material.emissive) o.material.emissive.setScalar(.25 * k); });
+  const k = (Math.sin(t * .005) + 1) / 2;
+  for (const [m] of mats) m.emissive.setHex(m.userData.e0);
+  for (const name of (s.hi || [])) {
+    if (focusables[name]) focusables[name].traverse(o => { if (o.material && o.material.emissive) o.material.emissive.setScalar(.35 * k); });
+  }
+  if (solved && s.quiz && focusables[s.quiz.target]) {
+    focusables[s.quiz.target].traverse(o => { if (o.material && o.material.emissive) o.material.emissive.setScalar(.3 * k); });
   }
   controls.update();
   renderer.render(scene, camera);
