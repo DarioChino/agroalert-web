@@ -177,7 +177,7 @@
               <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
             </a>
           </div>
-          <p class="hero-meta">Android 8.0 o superior · APK 1,7 MB · Versión 1.5.0</p>
+          <p class="hero-meta">Android 8.0 o superior · APK 2,9 MB · Versión 1.6.0</p>
         </div>
 
         <div class="hero-visual reveal" style="--delay:.12s">
@@ -280,7 +280,7 @@
 
         <p class="scope-note glass reveal">
           <svg class="icon" aria-hidden="true"><use href="#i-sprout"/></svg>
-          La app 1.5.0 conecta por Bluetooth con el Arduino Uno + HC-05 (baud negociado automáticamente), también por Wi-Fi con el nodo o el simulador, y permite crear cuentas propias con acceso completo.
+          La app 1.6.0 conecta por Bluetooth con el Arduino Uno + HC-05 (baud negociado automáticamente), también por Wi-Fi con el nodo o el simulador, y permite crear cuentas propias con acceso completo. Las cuentas, claves y la bitácora viajan a Firebase (proyecto <code>agroalert-5a4ad</code>).
         </p>
       </div>
     </section>
@@ -386,7 +386,7 @@
           <article class="card card--compact glass reveal" style="--delay:.06s">
             <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></span>
             <h3>Contraseñas protegidas</h3>
-            <p>Se guardan con sal aleatoria y PBKDF2-HMAC-SHA256; nunca en texto plano. Firebase Auth está preparado para tomar el relevo.</p>
+            <p>Firebase Auth gestiona el acceso; Firestore guarda el historial de claves con PBKDF2-HMAC-SHA256 y sal aleatoria, nunca en texto plano.</p>
           </article>
           <article class="card card--compact glass reveal" style="--delay:.12s">
             <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></span>
@@ -432,34 +432,34 @@
             </div>
 
             <dl class="download-facts">
-              <div><dt>Versión</dt><dd>1.5.0</dd></div>
+              <div><dt>Versión</dt><dd>1.6.0</dd></div>
               <div><dt>Requisito</dt><dd>Android 8.0 o superior</dd></div>
-              <div><dt>Tamaño</dt><dd>1,7 MB</dd></div>
+              <div><dt>Tamaño</dt><dd>2,9 MB</dd></div>
               <div><dt>Actualizado</dt><dd>20-11-2026</dd></div>
             </dl>
 
-            <a class="btn btn--primary btn--wide" href="assets/AgroAlert-1.5.0.apk" download>
+            <a class="btn btn--primary btn--wide" href="assets/AgroAlert-1.6.0.apk" download>
               <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
-              Descargar APK 1.5.0
+              Descargar APK 1.6.0
             </a>
 
             <p class="download-note">
-              Novedades 1.5.0: una sola clase de cuenta (sin perfiles), Firebase
-              Auth/Firestore preparado para activar y la reparación Bluetooth v1.4
-              (baud 38400/9600 negociado, reconexión sola). Las claves mantienen
-              historial de 3, vigencia de 90 días y rechazo de patrones comunes.
-              ¿Versión anterior?
-              <a href="assets/AgroAlert-1.4.0.apk" download>Descargar APK 1.4.0</a>.
+              Novedades 1.6.0: Firebase Auth/Firestore activo en el proyecto
+              <code>agroalert-5a4ad</code> (cuentas, historial de claves y bitácora en la nube,
+              sin caché local), además de la cuenta única sin perfiles y la reparación
+              Bluetooth v1.4. Las claves mantienen historial de 3, vigencia de 90 días
+              y rechazo de patrones comunes. ¿Versión anterior?
+              <a href="assets/AgroAlert-1.5.0.apk" download>Descargar APK 1.5.0</a>.
             </p>
 
             <p class="download-note">
-              El archivo está firmado para instalación directa. No requiere servicios
-              en la nube ni planes de pago.
+              El archivo está firmado para instalación directa. Firebase Auth y
+              Firestore tienen capa gratuita; la telemetría sigue siendo local.
             </p>
 
             <details class="sha">
               <summary>Ver huella SHA-256</summary>
-              <code>48ED536D4224464A5FD03E5321B2CE40AD26F8FC572A65817A8257E8EC110B18</code>
+              <code>B6AEE3CCF7725ACC5B77B245B26EAF3DE70F70B38C91740A7AE2152E91258721</code>
             </details>
           </div>
 
@@ -475,7 +475,7 @@
               </li>
               <li>
                 <span class="install-num">3</span>
-                <div><strong>Abre la app e inicia sesión</strong><p>Cuenta inicial: admin / admin1. Cualquier cuenta creada ve y controla todo.</p></div>
+                <div><strong>Abre la app e inicia sesión</strong><p>Crea tu cuenta con correo y clave, o usa admin / admin1. Cualquier cuenta ve y controla todo.</p></div>
               </li>
             </ol>
 
