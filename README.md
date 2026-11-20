@@ -7,7 +7,7 @@ riego desde el celular, por Wi-Fi. Proyecto TI3042 · INACAP · 2026, de
 - **Sitio publicado:** https://dariochino.github.io/agroalert-web/
 - **Repositorio de la app:** https://github.com/DarioChino/agroalert-araucania
 - **Descarga del APK:** desde el sitio, sección «Descargar»
-  (APK 1.0.0 firmado para Android 8.0 o superior).
+  (APK 1.4.0 firmado para Android 8.0 o superior).
 
 ## Estructura
 
