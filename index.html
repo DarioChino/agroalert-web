@@ -177,7 +177,7 @@
               <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
             </a>
           </div>
-          <p class="hero-meta">Android 8.0 o superior · APK 2,9 MB · Versión 1.6.0</p>
+          <p class="hero-meta">Android 8.0 o superior · APK 2,9 MB · Versión 1.7.0</p>
         </div>
 
         <div class="hero-visual reveal" style="--delay:.12s">
@@ -280,7 +280,7 @@
 
         <p class="scope-note glass reveal">
           <svg class="icon" aria-hidden="true"><use href="#i-sprout"/></svg>
-          La app 1.6.0 conecta por Bluetooth con el Arduino Uno + HC-05 (baud negociado automáticamente), también por Wi-Fi con el nodo o el simulador, y permite crear cuentas propias con acceso completo. Las cuentas, claves y la bitácora viajan a Firebase (proyecto <code>agroalert-5a4ad</code>).
+          La app 1.7.0 conecta por Bluetooth con el Arduino Uno + HC-05 (baud negociado automáticamente), también por Wi-Fi con el nodo o el simulador, y permite crear cuentas propias con correo real y recuperar la clave por Firebase. Las cuentas, claves y la bitácora viajan a Firebase (proyecto <code>agroalert-5a4ad</code>).
         </p>
       </div>
     </section>
@@ -381,7 +381,7 @@
           <article class="card card--compact glass reveal">
             <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg></span>
             <h3>Ingreso con 3 intentos</h3>
-            <p>Tras tres intentos fallidos, el acceso se bloquea durante 60 segundos.</p>
+            <p>Tras tres intentos fallidos la espera crece (60 s, 5 min, 15 min). Firebase además limita las peticiones y oculta qué correos existen.</p>
           </article>
           <article class="card card--compact glass reveal" style="--delay:.06s">
             <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></span>
@@ -432,24 +432,26 @@
             </div>
 
             <dl class="download-facts">
-              <div><dt>Versión</dt><dd>1.6.0</dd></div>
+              <div><dt>Versión</dt><dd>1.7.0</dd></div>
               <div><dt>Requisito</dt><dd>Android 8.0 o superior</dd></div>
               <div><dt>Tamaño</dt><dd>2,9 MB</dd></div>
               <div><dt>Actualizado</dt><dd>20-11-2026</dd></div>
             </dl>
 
-            <a class="btn btn--primary btn--wide" href="assets/AgroAlert-1.6.0.apk" download>
+            <a class="btn btn--primary btn--wide" href="assets/AgroAlert-1.7.0.apk" download>
               <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
-              Descargar APK 1.6.0
+              Descargar APK 1.7.0
             </a>
 
             <p class="download-note">
-              Novedades 1.6.0: Firebase Auth/Firestore activo en el proyecto
-              <code>agroalert-5a4ad</code> (cuentas, historial de claves y bitácora en la nube,
-              sin caché local), además de la cuenta única sin perfiles y la reparación
+              Novedades 1.7.0: registro con correo real, recuperación de clave por
+              enlace de Firebase, bloqueo progresivo por intentos y protección contra
+              enumeración de correos. Conserva Firebase Auth/Firestore activo en
+              <code>agroalert-5a4ad</code> (cuentas, historial de claves y bitácora en la
+              nube, sin caché local), la cuenta única sin perfiles y la reparación
               Bluetooth v1.4. Las claves mantienen historial de 3, vigencia de 90 días
               y rechazo de patrones comunes. ¿Versión anterior?
-              <a href="assets/AgroAlert-1.5.0.apk" download>Descargar APK 1.5.0</a>.
+              <a href="assets/AgroAlert-1.6.0.apk" download>Descargar APK 1.6.0</a>.
             </p>
 
             <p class="download-note">
@@ -459,7 +461,7 @@
 
             <details class="sha">
               <summary>Ver huella SHA-256</summary>
-              <code>B6AEE3CCF7725ACC5B77B245B26EAF3DE70F70B38C91740A7AE2152E91258721</code>
+              <code>0713C5F809CE192BF1323BF05BC6A339FA5E9C220F8363F41C967E4E08EFE652</code>
             </details>
           </div>
 
