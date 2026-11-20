@@ -164,8 +164,8 @@
           <h1>Tu cultivo, protegido <span class="accent">antes de la helada.</span></h1>
           <p class="lead">
             AgroAlert monitorea la temperatura y la humedad de tu huerto y te permite
-            verlas y controlar el riego desde tu celular, por Wi-Fi. Sin nube y sin
-            depender de estar ahí.
+            verlas y controlar el riego desde tu celular, por Bluetooth o Wi-Fi,
+            sin depender de estar ahí.
           </p>
           <div class="hero-actions">
             <a class="btn btn--primary" href="#descargar">
@@ -177,7 +177,7 @@
               <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
             </a>
           </div>
-          <p class="hero-meta">Android 8.0 o superior · APK 1,7 MB · Versión 1.4.0</p>
+          <p class="hero-meta">Android 8.0 o superior · APK 1,7 MB · Versión 1.5.0</p>
         </div>
 
         <div class="hero-visual reveal" style="--delay:.12s">
@@ -280,7 +280,7 @@
 
         <p class="scope-note glass reveal">
           <svg class="icon" aria-hidden="true"><use href="#i-sprout"/></svg>
-          La app 1.4.0 conecta por Bluetooth con el Arduino Uno + HC-05 (baud negociado automáticamente), también por Wi-Fi con el nodo o el simulador, y permite crear cuentas propias en el teléfono.
+          La app 1.5.0 conecta por Bluetooth con el Arduino Uno + HC-05 (baud negociado automáticamente), también por Wi-Fi con el nodo o el simulador, y permite crear cuentas propias con acceso completo.
         </p>
       </div>
     </section>
@@ -312,8 +312,8 @@
           </article>
           <article class="card glass reveal" style="--delay:.18s">
             <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></span>
-            <h3>Dos roles</h3>
-            <p><strong>Control</strong> opera el riego. <strong>Monitor</strong> solo consulta: no tiene botones de mando.</p>
+            <h3>Cuenta única</h3>
+            <p>Toda cuenta creada ve el panel y controla el riego. No hay perfiles Control ni Monitor.</p>
           </article>
           <article class="card glass reveal" style="--delay:.24s">
             <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg></span>
@@ -386,12 +386,12 @@
           <article class="card card--compact glass reveal" style="--delay:.06s">
             <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></span>
             <h3>Contraseñas protegidas</h3>
-            <p>Se guardan con sal aleatoria y PBKDF2-HMAC-SHA256; nunca en texto plano.</p>
+            <p>Se guardan con sal aleatoria y PBKDF2-HMAC-SHA256; nunca en texto plano. Firebase Auth está preparado para tomar el relevo.</p>
           </article>
           <article class="card card--compact glass reveal" style="--delay:.12s">
             <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></span>
-            <h3>Permisos separados</h3>
-            <p>Control puede operar el riego. Monitor solo consulta: el nodo también rechaza sus órdenes.</p>
+            <h3>Acceso completo</h3>
+            <p>Toda cuenta autenticada opera el riego; el nodo sigue exigiendo su clave.</p>
           </article>
           <article class="card card--compact glass reveal" style="--delay:.18s">
             <span class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span>
@@ -418,7 +418,7 @@
         <header class="section-head reveal">
           <p class="eyebrow">Descarga</p>
           <h2>Lleva AgroAlert a tu celular.</h2>
-          <p class="lead">Instalación directa, sin cuentas y sin tiendas de aplicaciones.</p>
+          <p class="lead">Instalación directa, sin tiendas de aplicaciones ni servicios obligatorios.</p>
         </header>
 
         <div class="download-grid">
@@ -432,33 +432,34 @@
             </div>
 
             <dl class="download-facts">
-              <div><dt>Versión</dt><dd>1.4.0</dd></div>
+              <div><dt>Versión</dt><dd>1.5.0</dd></div>
               <div><dt>Requisito</dt><dd>Android 8.0 o superior</dd></div>
               <div><dt>Tamaño</dt><dd>1,7 MB</dd></div>
               <div><dt>Actualizado</dt><dd>20-11-2026</dd></div>
             </dl>
 
-            <a class="btn btn--primary btn--wide" href="assets/AgroAlert-1.4.0.apk" download>
+            <a class="btn btn--primary btn--wide" href="assets/AgroAlert-1.5.0.apk" download>
               <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
-              Descargar APK 1.4.0
+              Descargar APK 1.5.0
             </a>
 
             <p class="download-note">
-              Novedades 1.4.0: el HC-05 conecta de forma fiable (baud 38400/9600
-              negociado automáticamente, reconexión sola y errores claros), y las
-              claves tienen historial de 3, vigencia de 90 días y rechazo de patrones
-              comunes. ¿Versión anterior?
-              <a href="assets/AgroAlert-1.2.0.apk" download>Descargar APK 1.2.0</a>.
+              Novedades 1.5.0: una sola clase de cuenta (sin perfiles), Firebase
+              Auth/Firestore preparado para activar y la reparación Bluetooth v1.4
+              (baud 38400/9600 negociado, reconexión sola). Las claves mantienen
+              historial de 3, vigencia de 90 días y rechazo de patrones comunes.
+              ¿Versión anterior?
+              <a href="assets/AgroAlert-1.4.0.apk" download>Descargar APK 1.4.0</a>.
             </p>
 
             <p class="download-note">
-              El archivo está firmado para instalación directa. No requiere cuenta ni
-              servicios en la nube.
+              El archivo está firmado para instalación directa. No requiere servicios
+              en la nube ni planes de pago.
             </p>
 
             <details class="sha">
               <summary>Ver huella SHA-256</summary>
-              <code>CB2D2DB35F5B9D58644FA718C4D9B63F53CC8DAA1DEA9E32C11D0E0BF66E32A0</code>
+              <code>48ED536D4224464A5FD03E5321B2CE40AD26F8FC572A65817A8257E8EC110B18</code>
             </details>
           </div>
 
@@ -474,7 +475,7 @@
               </li>
               <li>
                 <span class="install-num">3</span>
-                <div><strong>Abre la app e inicia sesión</strong><p>Cuentas iniciales: admin (control del riego) y monitor (solo lectura).</p></div>
+                <div><strong>Abre la app e inicia sesión</strong><p>Cuenta inicial: admin / admin1. Cualquier cuenta creada ve y controla todo.</p></div>
               </li>
             </ol>
 
